@@ -11,7 +11,7 @@ const io = new Server(server);
 app.use(express.static(__dirname));
 
 // --- 1. MONGODB ATLAS BAĞLANTISI ---
-const MONGO_URI = 'mongodb+srv://iso:<db_password>@cluster0.gt06c6w.mongodb.net/?appName=Cluster0'; 
+const MONGO_URI = 'mongodb+srv://xoxdeneme:xoxdeneme@cluster0.1ruzpko.mongodb.net/?appName=Cluster0'; 
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('Sultanım, MongoDB Atlas bağlantısı muzafferiyetle sağlandı!'))

@@ -2,30 +2,25 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
-const cors = require('cors'); // Farklı sitelerden bağlantı için gerekli
+const cors = require('cors');
 
 const app = express();
-app.use(cors()); // Güvenlik duvarını esnetir
-
+app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: "*", // Tüm dünyadan bağlantıya izin ver
-        methods: ["GET", "POST"]
-    }
+    cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
 // --- MONGODB ATLAS BAĞLANTISI ---
-// <db_password> kısmını kendi şifrenizle değiştirmeyi unutmayın!
-const MONGO_URI = 'mongodb+srv://iso:<db_password>@cluster0.gt06c6w.mongodb.net/?appName=Cluster0'; 
+// <db_password> kısmını Atlas'taki şifrenle değiştirmeyi UNUTMA!
+const MONGO_URI = 'mongodb+srv://iso:123456789@cluster0.gt06c6w.mongodb.net/?appName=Cluster0'; 
 
 mongoose.connect(MONGO_URI)
-    .then(() => console.log('Sultanım, veritabanı bağlantısı muzafferiyetle sağlandı!'))
-    .catch(err => console.error('Veritabanı hatası:', err));
+    .then(() => console.log('Sultanım, MongoDB bağlantısı başarılı!'))
+    .catch(err => console.error('MongoDB hatası:', err));
 
-// KULLANICI ŞEMASI
 const userSchema = new mongoose.Schema({
-    username: { type: String, unique: true, required: true },
+    username: String,
     puan: { type: Number, default: 50 },
     w: { type: Number, default: 0 },
     d: { type: Number, default: 0 },
@@ -36,7 +31,7 @@ const User = mongoose.model('User', userSchema);
 let havuzlar = { "5": [], "15": [], "30": [] };
 
 io.on('connection', (socket) => {
-    console.log('Yeni bir sultan bağlandı:', socket.id);
+    console.log('Yeni sultan bağlandı:', socket.id);
 
     socket.on('havuzaGir', (data) => {
         socket.oyuncu = data;
@@ -46,7 +41,6 @@ io.on('connection', (socket) => {
             socket.join(oda);
             rakip.join(oda);
             
-            // Server tarafında tarafsız kura çekimi
             const baslayan = Math.random() < 0.5 ? 'X' : 'O';
             
             rakip.emit('macBasladi', { rakipAd: data.ad, sembol: 'X', oda: oda, baslayan: baslayan });
@@ -63,7 +57,14 @@ io.on('connection', (socket) => {
     socket.on('updateStats', async (data) => {
         try {
             await User.findOneAndUpdate({ username: data.ad }, data, { upsert: true });
-        } catch (err) { console.log("Stat güncelleme hatası"); }
+        } catch (e) { console.log("Stat hatası"); }
+    });
+
+    socket.on('getLeaderboard', async () => {
+        try {
+            const top = await User.find().sort({ puan: -1 }).limit(10);
+            socket.emit('leaderboardData', top);
+        } catch (e) { console.log("Liderlik hatası"); }
     });
 
     socket.on('disconnect', () => {
@@ -72,4 +73,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Sultanlar Divanı ${PORT} portunda kuruldu!`));
+server.listen(PORT, () => console.log(`Sunucu ${PORT} portunda aktif.`));

@@ -13,7 +13,7 @@ const io = new Server(server, {
 
 // --- MONGODB ATLAS BAĞLANTISI ---
 // <db_password> kısmını Atlas'taki şifrenle değiştirmeyi UNUTMA!
-const MONGO_URI = 'mongodb+srv://iso:123456789@cluster0.gt06c6w.mongodb.net/?appName=Cluster0'; 
+const MONGO_URI = 'mongodb+srv://iso:xoxdeneme@cluster0.gt06c6w.mongodb.net/?appName=Cluster0'; 
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('Sultanım, MongoDB bağlantısı başarılı!'))

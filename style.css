@@ -1,0 +1,187 @@
+/* --- 1. GENEL SAYFA AYARLARI --- */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    font-family: 'Georgia', serif; /* Tarihi atmosfer için tırnaklı font */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Sayfanın kaymasını engeller */
+
+    /* ARKA PLAN RESMİ */
+    background-image: url('arka-plan.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* --- 2. ANA MENÜ (KONTEYNER) --- */
+#menu-container {
+    display: flex;
+    flex-direction: column; /* Her şeyi (Başlık + Butonlar) alt alta dizer */
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    /* Padding artık makul seviyede */
+    padding: 20px;
+}
+
+/* Başlık (XOX Yazısı) */
+#menu-container h1 {
+    font-size: 6rem;
+    color: #e74c3c; /* Kırmızı */
+    margin: 0 0 40px 0;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+    letter-spacing: 15px;
+}
+
+/* --- 3. BUTONLARIN DİZİLİMİ --- */
+.menu-buttons, #difficulty-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0px; /* Butonların arasında boşluk olmasın (Blok yapı) */
+    width: 350px; /* Buton genişliği */
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.5); /* Hafif derinlik */
+}
+
+/* Tüm Butonların Ortak Stili */
+.menu-button {
+    width: 100%;
+    height: 75px; /* Standart yükseklik */
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #1a1a1a; /* Yazı rengi */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Buton Renkleri */
+#training-btn { background-color: #3498db; } /* Mavi */
+#friend-btn   { background-color: #2ecc71; } /* Yeşil */
+#online-btn   { background-color: #fd9002; } /* Turuncu */
+
+/* Çıkış Butonu (Daha ince ve Kırmızı) */
+#exit-btn { 
+    background-color: #e74c3c; 
+    height: 40px; 
+    font-size: 0.9rem;
+}
+
+/* Zorluk Menüsü Başlığı */
+#difficulty-container h2 {
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    margin: 0;
+    padding: 15px;
+    text-align: center;
+}
+
+/* --- 4. OYUN ALANI (GAME-AREA) --- */
+#game-area {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+#game-area h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* --- 5. OYUN TAHTASI (BOARD) --- */
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    grid-template-rows: repeat(3, 120px);
+    gap: 8px;
+    margin-bottom: 40px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+/* --- 6. HÜCRELER (CELLS) --- */
+.cell {
+    width: 120px;
+    height: 120px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 3rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 4px;
+    transition: 0.3s;
+    color: #333;
+}
+
+.cell:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+}
+
+/* --- 7. OYUN KONTROLLERI --- */
+.game-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#status {
+    color: white;
+    font-size: 1.5rem;
+    margin-top: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Yeniden Başlat Butonu */
+#restart-btn {
+    background-color: #f1c40f !important;
+    color: #333 !important;
+    padding: 15px 30px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s;
+}
+
+#restart-btn:hover {
+    background-color: #f39c12 !important;
+    transform: scale(1.05);
+}
+
+/* Geri Dön Butonları */
+#back-to-difficulty-btn,
+#game-back-btn {
+    padding: 15px 25px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    transition: 0.3s;
+}
+
+#back-to-difficulty-btn:hover,
+#game-back-btn:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}

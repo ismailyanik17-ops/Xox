@@ -2,24 +2,24 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XOX Pro - Sultanlar Divanı V2.6</title>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOX Pro - Sultanlar Ligi V2.1</title>
+    <script src="/socket.io/socket.io.js"></script>
     <style>
         :root {
             --ana-bg: #1a252f;
-            --panel-bg: rgba(44, 62, 80, 0.95);
+            --panel-bg: #2c3e50;
             --buton-bg: #3498db;
             --yazi-renk: white;
         }
 
-        /* SENİN SEÇTİĞİN ARKA PLAN GÖRSELİ */
+        .tema-koyu { --ana-bg: #1a252f; --panel-bg: #2c3e50; --buton-bg: #3498db; }
+        .tema-altin { --ana-bg: #3d3522; --panel-bg: #b8860b; --buton-bg: #8b4513; }
+        .tema-zumrut { --ana-bg: #062e1f; --panel-bg: #216148; --buton-bg: #1e8449; }
+
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('Arka Plan.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-color: var(--ana-bg);
             color: var(--yazi-renk);
             margin: 0;
             display: flex;
@@ -30,19 +30,16 @@
             transition: 0.5s;
         }
 
-        /* ÜST SİMGELER */
         #ayarlar-btn, #hesap-btn, #lider-btn {
             position: fixed; top: 20px; cursor: pointer; transition: 0.3s; z-index: 100; font-size: 30px;
         }
         #ayarlar-btn { right: 20px; } #lider-btn { right: 70px; } #hesap-btn { right: 120px; }
 
-        /* PANELLER (HESAP, LİDERLİK, AYARLAR) */
         .panel {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background-color: var(--panel-bg); padding: 30px; border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8); z-index: 200; text-align: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.7); z-index: 200; text-align: center;
             width: 340px; border: 2px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
         }
 
         .profil-resmi {
@@ -61,11 +58,10 @@
             background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin: 15px 0;
         }
 
-        /* EKRANLAR */
         .ekran { display: none; flex-direction: column; align-items: center; width: 100%; }
         .aktif { display: flex; }
 
-        h1 { font-size: 60px; margin-bottom: 30px; color: #f1c40f; letter-spacing: 8px; text-shadow: 3px 3px 15px rgba(0,0,0,0.7); }
+        h1 { font-size: 70px; margin-bottom: 30px; color: #f1c40f; letter-spacing: 8px; text-shadow: 3px 3px 15px rgba(0,0,0,0.5); }
         
         button {
             padding: 15px; font-size: 18px; margin: 10px; cursor: pointer; border: none;
@@ -74,30 +70,26 @@
         }
         button:hover { filter: brightness(1.2); transform: translateY(-2px); }
         .btn-cikis { background-color: #e74c3c; }
+        .btn-ikincil { background-color: #9b59b6; }
 
-        /* OYUN TAHTASI */
         .oyun-tahtasi { display: grid; grid-template-columns: repeat(3, 110px); gap: 10px; margin-top: 20px; }
         .kutu {
-            width: 110px; height: 110px; background-color: rgba(236, 240, 241, 0.9); border-radius: 15px;
-            display: flex; justify-content: center; align-items: center;
+            width: 110px; height: 110px; background-color: #ecf0f1; border-radius: 15px;
+            font-size: 60px; color: #2c3e50; display: flex; justify-content: center; align-items: center;
             cursor: pointer; font-weight: bold; box-shadow: 0 5px 0 #bdc3c7;
         }
-        
-        /* İKONLAR */
-        .kilic-x { color: #e74c3c; font-size: 55px; }
-        .fes-o { position: relative; color: #3498db; font-size: 50px; }
-        .fes-o::after { content: '🏮'; position: absolute; top: -35px; left: 50%; transform: translateX(-50%); font-size: 35px; }
 
         #timer-box { display: none; width: 250px; height: 12px; background: #555; margin: 15px 0; border-radius: 6px; overflow: hidden; }
-        #timer-bar { width: 100%; height: 100%; background: #e67e22; transition: width 0.1s linear; }
+        #timer-bar { width: 100%; height: 100%; background: #e67e22; }
 
         .lider-satir { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
-<body>
+<body class="tema-koyu">
 
     <audio id="ses-tik" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
     <audio id="ses-kazan" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+    <audio id="ses-kaybet" src="https://assets.mixkit.co/active_storage/sfx/2530/2530-preview.mp3"></audio>
 
     <div id="hesap-btn" onclick="paneliAc('hesap-paneli')">👤</div>
     <div id="lider-btn" onclick="paneliAc('lider-paneli')">🏆</div>
@@ -129,35 +121,41 @@
         <h3>AYARLAR</h3>
         <p>Ses Durumu: <b id="ses-txt">Açık</b></p>
         <button onclick="sesToggle()" style="width:160px; padding:10px;">Sesi Aç/Kapat</button>
+        <hr>
+        <p>Zemin Seçimi</p>
+        <button class="btn-tema" onclick="temaSec('tema-koyu')">Koyu</button>
+        <button class="btn-tema" style="background:#b8860b" onclick="temaSec('tema-altin')">Altın</button>
+        <button class="btn-tema" style="background:#216148" onclick="temaSec('tema-zumrut')">Zümrüt</button>
         <button onclick="panelleriKapat()" style="width:150px; margin-top:20px;">Kapat</button>
     </div>
 
     <div id="ana-menu" class="ekran aktif">
-        <h1>XOX PRO</h1>
+        <h1>XOX</h1>
         <button onclick="ekranDegistir('ai-menu')">Yapay Zekaya Karşı</button>
         <button onclick="baslatPVP()">Arkadaşına Karşı</button>
         <button onclick="ekranDegistir('online-menu')">Online Maç</button>
+        <button class="btn-cikis" onclick="window.close()">Çıkış</button>
     </div>
 
     <div id="ai-menu" class="ekran">
         <h2>Zorluk Seç</h2>
-        <button onclick="baslatAI('kolay')">Kolay</button>
-        <button onclick="baslatAI('normal')">Normal</button>
-        <button onclick="baslatAI('zor')">Zor</button>
+        <button class="btn-ikincil" onclick="baslatAI('kolay')">Kolay</button>
+        <button class="btn-ikincil" onclick="baslatAI('normal')">Normal</button>
+        <button class="btn-ikincil" onclick="baslatAI('zor')">Zor</button>
         <button onclick="ekranDegistir('ana-menu')">Geri</button>
     </div>
 
     <div id="online-menu" class="ekran">
         <h2>Süre Seç</h2>
-        <button onclick="baslatOnline(5)">5 Saniye</button>
-        <button onclick="baslatOnline(15)">15 Saniye</button>
-        <button onclick="baslatOnline(30)">30 Saniye</button>
+        <button class="btn-ikincil" onclick="baslatOnline(5)">5 Saniye</button>
+        <button class="btn-ikincil" onclick="baslatOnline(15)">15 Saniye</button>
+        <button class="btn-ikincil" onclick="baslatOnline(30)">30 Saniye</button>
         <button onclick="ekranDegistir('ana-menu')">Geri</button>
     </div>
 
     <div id="oyun-ekrani" class="ekran">
         <h3 id="ust-bilgi" style="color: #f1c40f; margin:0;"></h3>
-        <p id="mesaj-txt" style="font-size: 24px; margin:10px 0;">Sıra: ⚔️</p>
+        <p id="mesaj-txt" style="font-size: 24px; margin:10px 0;">Sıra: X</p>
         <div id="timer-box"><div id="timer-bar"></div></div>
         <div class="oyun-tahtasi" id="board"></div>
         <button id="restart-btn" style="display: none; background-color: #27ae60;" onclick="oyunuSifirla()">Tekrar Oyna</button>
@@ -165,30 +163,24 @@
     </div>
 
     <script>
-        // --- AYARLAR ---
-        // BURAYA RENDER LİNKİNİ YAZ (Örn: https://xox.onrender.com)
-        const SERVER_URL = "https://ismailyanik17-ops.github.io/Xox/"; 
-
-        let stats = { ad: "Oyuncu 1", puan: 50, w: 0, d: 0, l: 0, id: 0, ses: true };
+        // --- HAFIZA VE STATLAR ---
+        let stats = { ad: "Oyuncu 1", puan: 50, w: 0, d: 0, l: 0, id: 0, ses: true, tema: 'tema-koyu' };
         let socket;
-        
-        try { 
-            socket = io(SERVER_URL); 
-            socket.on('connect', () => console.log("✅ Sunucuya Bağlanıldı!"));
-            socket.on('connect_error', () => console.log("❌ Bağlantı Yok (Offline Mod)"));
-        } catch(e) { console.log("Offline Mod"); }
+        try { socket = io(); } catch(e) { console.log("Server bağlantısı yok."); }
 
         function verileriYukle() {
-            let data = localStorage.getItem('xox_pro_final');
+            let data = localStorage.getItem('xox_pro_v2');
             if(data) stats = JSON.parse(data);
             else stats.id = Math.floor(Math.random() * 89999) + 10000;
+            
             document.getElementById('isim-input').value = stats.ad;
             document.getElementById('hesap-id').innerText = "ID: #" + stats.id;
+            temaSec(stats.tema);
             uiGuncelle();
         }
-        
-        function verileriKaydet() { localStorage.setItem('xox_pro_final', JSON.stringify(stats)); }
+        function verileriKaydet() { localStorage.setItem('xox_pro_v2', JSON.stringify(stats)); }
         function isimKaydet() { stats.ad = document.getElementById('isim-input').value; verileriKaydet(); }
+        function temaSec(t) { document.body.className = t; stats.tema = t; verileriKaydet(); }
         function sesToggle() { stats.ses = !stats.ses; uiGuncelle(); verileriKaydet(); }
         function sesPlay(id) { if(stats.ses) { let s = document.getElementById(id); s.currentTime = 0; s.play(); } }
 
@@ -203,20 +195,23 @@
             let r = "Efendi", i = "🏮";
             if(p > 750) { r = "Sultan"; i = "👑"; }
             else if(p > 500) r = "Veziriazam";
+            else if(p > 400) r = "Vezir";
+            else if(p > 350) r = "Beylerbeyi";
+            else if(p > 300) r = "Paşa";
+            else if(p > 250) r = "Sancakbeyi";
             else if(p > 150) r = "Ağa";
             document.getElementById('rutbe-adi').innerText = i + " " + r.toUpperCase();
         }
 
         // --- OYUN MANTIĞI ---
         let tahta = Array(9).fill('');
-        let sira = 'X', bitti = false, mod = '', zorluk = '', onlineSira = '', odaId = '', baslangicSirasi = 'X';
+        let sira = 'X', bitti = false, mod = '', zorluk = '', onlineSira = '', odaId = '';
         let timer, limit, kalan;
 
         function ekranDegistir(id) {
             document.querySelectorAll('.ekran').forEach(e => e.classList.remove('aktif'));
             document.getElementById(id).classList.add('aktif');
         }
-        
         function paneliAc(id) { panelleriKapat(); document.getElementById(id).style.display='block'; if(id==='lider-paneli') liderGoster(); }
         function panelleriKapat() { document.querySelectorAll('.panel').forEach(p=>p.style.display='none'); }
         function menuyeDon() { clearInterval(timer); ekranDegistir('ana-menu'); }
@@ -231,8 +226,7 @@
         function baslatAI(z) { mod='AI'; zorluk=z; setup("BOT: " + z.toUpperCase()); }
         function baslatPVP() { mod='PVP'; setup("ARKADAŞINA KARŞI"); }
         function baslatOnline(s) { 
-            mod='ONLINE'; limit=s; odaId = ''; 
-            setup("ONLINE BEKLENİYOR..."); 
+            mod='ONLINE'; limit=s; setup("ONLINE BEKLENİYOR..."); 
             if(socket) socket.emit('havuzaGir', {ad: stats.ad, puan: stats.puan, sure: s.toString()});
         }
 
@@ -240,14 +234,13 @@
             socket.on('macBasladi', (d) => {
                 onlineSira = d.sembol;
                 odaId = d.oda;
-                baslangicSirasi = d.baslayan;
                 document.getElementById('ust-bilgi').innerText = `Rakip: ${d.rakipAd}`;
                 oyunuSifirla();
             });
             socket.on('rakipHamleYapti', (d) => {
                 tahta[d.idx] = d.sembol;
                 ciz();
-                if(!kontrol()) { sira = onlineSira; msg(); baslatBar(); }
+                if(!kontrol()) { sira=onlineSira; msg(); baslatBar(); }
             });
         }
 
@@ -257,8 +250,8 @@
             tahta.forEach((v, i) => {
                 const d = document.createElement('div');
                 d.className = 'kutu';
-                if (v === 'X') d.innerHTML = '<span class="kilic-x">⚔️</span>';
-                else if (v === 'O') d.innerHTML = '<span class="fes-o">O</span>';
+                d.innerText = v;
+                d.style.color = v==='X'?'#e74c3c':'#3498db';
                 d.onclick = () => hamle(i);
                 b.appendChild(d);
             });
@@ -266,26 +259,30 @@
 
         function hamle(i) {
             if(bitti || tahta[i] !== '') return;
-            if(mod === 'ONLINE' && sira !== onlineSira) return;
+            if(mod==='ONLINE' && sira !== onlineSira) return;
+
             sesPlay('ses-tik');
             tahta[i] = sira;
             ciz();
-            if(mod === 'ONLINE' && socket) socket.emit('hamleYap', {idx: i, sembol: sira, oda: odaId});
+            if(mod==='ONLINE' && socket) socket.emit('hamleYap', {idx: i, sembol: sira, oda: odaId});
+
             if(kontrol()) return;
-            sira = (sira === 'X' ? 'O' : 'X');
+            sira = (sira==='X'?'O':'X');
             msg();
-            if(mod === 'ONLINE') baslatBar();
-            if(mod === 'AI' && sira === 'O') setTimeout(bot, 500);
+
+            if(mod==='ONLINE') baslatBar();
+            if(mod==='AI' && sira==='O') setTimeout(bot, 500);
         }
 
         function bot() {
             let h, r = Math.random();
-            let e = (zorluk==='kolay'?0.4 : zorluk==='normal'?0.6 : 0.9);
+            let e = (zorluk==='kolay'?0.45 : zorluk==='normal'?0.65 : 0.90);
             if(r < e) h = enIyi(); else h = boslar()[Math.floor(Math.random()*boslar().length)];
             if(h !== undefined) hamle(h);
         }
 
         function boslar() { return tahta.map((v,i)=>v===''?i:null).filter(v=>v!==null); }
+
         function enIyi() {
             let s = -Infinity, h;
             for(let i=0; i<9; i++) {
@@ -318,11 +315,13 @@
         }
 
         function baslatBar() {
-            clearInterval(timer); kalan = limit;
+            clearInterval(timer);
+            kalan = limit;
             const bar = document.getElementById('timer-bar');
             bar.style.width = '100%';
             timer = setInterval(() => {
-                kalan -= 0.1; bar.style.width = (kalan/limit)*100 + "%";
+                kalan -= 0.1;
+                bar.style.width = (kalan/limit)*100 + "%";
                 if(kalan <= 0) { clearInterval(timer); bittir("SÜRE BİTTİ!", sira==='X'?'O':'X'); }
             }, 100);
         }
@@ -330,44 +329,47 @@
         function kontrol() {
             let r = win(tahta);
             if(r) {
-                bitti = true; clearInterval(timer);
-                if(r==='X') sesPlay('ses-kazan');
-                bittir(r==='Berabere'?"BERABERE!": (r==='X'?"KAZANAN: ⚔️":"KAZANAN: O🏮"), r);
+                if(r==='X') sesPlay('ses-kazan'); else if(r==='O') sesPlay('ses-kaybet');
+                bittir(r==='Berabere'?"BERABERE!":"KAZANAN: "+r, r);
                 return true;
             }
             return false;
         }
 
         function bittir(m, r) {
+            bitti=true; clearInterval(timer);
             document.getElementById('mesaj-txt').innerText = m;
             document.getElementById('restart-btn').style.display = 'block';
+            
+            // STATLARI GÜNCELLE
             if(mod==='ONLINE') {
-                if(r === onlineSira) stats.puan += 1; else if(r === 'Berabere') stats.puan -= 0.5; else stats.puan -= 1;
-                uiGuncelle(); verileriKaydet();
-                if(socket) socket.emit('updateStats', stats);
+                if(r === onlineSira) { 
+                    stats.w++; stats.puan += 1; 
+                } else if(r === 'Berabere') { 
+                    stats.d++; stats.puan -= 0.5; 
+                } else { 
+                    stats.l++; stats.puan -= 1; 
+                }
+                if(stats.puan < 0) stats.puan = 0;
+                uiGuncelle(); 
+                verileriKaydet();
             }
         }
 
         function oyunuSifirla() {
-            tahta = Array(9).fill(''); bitti = false;
-            document.getElementById('restart-btn').style.display = 'none';
-            if (mod === 'ONLINE' && odaId !== '') sira = baslangicSirasi;
-            else sira = Math.random() < 0.5 ? 'X' : 'O';
-            msg(); ciz();
-            if (mod === 'ONLINE' && odaId !== '') baslatBar();
-            else if (mod === 'AI' && sira === 'O') setTimeout(bot, 500);
+            tahta=Array(9).fill(''); sira='X'; bitti=false;
+            document.getElementById('mesaj-txt').innerText = "Sıra: X";
+            document.getElementById('restart-btn').style.display='none';
+            ciz(); if(mod==='ONLINE') baslatBar();
         }
 
-        function msg() { document.getElementById('mesaj-txt').innerText = "Sıra: " + (sira === 'X' ? '⚔️' : 'O🏮'); }
+        function msg() { document.getElementById('mesaj-txt').innerText = "Sıra: " + sira; }
         
         function liderGoster() {
             const l = document.getElementById('lider-liste');
-            if(socket) {
-                socket.emit('getLeaderboard');
-                socket.on('leaderboardData', (data) => {
-                    l.innerHTML = data.map((d,i)=>`<div class="lider-satir"><span>${i+1}. ${d.username}</span><b>${Math.floor(d.puan)} P</b></div>`).join('');
-                });
-            }
+            // Burası normalde sunucudan gelmeli, şimdilik yerel bir simülasyon:
+            const data = [{ad:"Kanuni",puan:999},{ad:"Fatih",puan:850},{ad:stats.ad,puan:stats.puan}].sort((a,b)=>b.puan-a.puan);
+            l.innerHTML = data.map((d,i)=>`<div class="lider-satir"><span>${i+1}. ${d.ad}</span><b>${Math.floor(d.puan)} P</b></div>`).join('');
         }
 
         verileriYukle();
